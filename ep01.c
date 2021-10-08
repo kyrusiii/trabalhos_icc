@@ -74,6 +74,7 @@ double calculate_function(void *f, double x)
     int count;
     evaluator_get_variables(f, &names, &count);
     double f_x = evaluator_evaluate(f, count, names, values);
+	return f_x;
 }
 
 /* 
@@ -87,9 +88,15 @@ double next_value_newton(double x, void *f, void *f_prim)
 /* 
     Calcula próximo valor de x pelo metodo da secante 
 */
-double next_value_secante(double x, void *f, void *f_prim)
+double next_value_secante(double x, void *f, double xl)
 {
-    return 1.0;
+	double xn, f_x, f_xl;
+//	calcular fx e fxl	
+	f_x = calculate_function(f,x);
+	f_xl = calculate_function(f,xl);
+	xn = x + (xl / (1 - f_xl/f_x)) - ((x)/ (1 - f_xl/f_x) ) ;
+	return xn;
+//    return 1.0;
 }
 
 /* 
@@ -98,7 +105,7 @@ double next_value_secante(double x, void *f, void *f_prim)
 double calculate_error(double cur, double next)
 {   
     // abs((next - cur)/next) 
-    return abs(1 - cur/next);
+    return fabs(1 - cur/next);
 }
 
 /* 
@@ -123,11 +130,29 @@ iterations_t *calculate_zero(void *f, double x0, double epsilon, int max_iter)
     return iterations;
 }
 
+/*
+	Calcula o erro entre os métodos empregados
+*/
+double calculate_absolute_error(double cur, double next){
+	return fabs( newt - sec);
+//	return 1.0;
+}
+
+/*
+	Calcula os ULP entre cada aproximação
+*/
+/*
+int ulp(double newt, double sec){
+	
+	return 1;
+}
+*/
 int main()
 {
     char buffer[MAX_BUFFER_SIZE];
     void *f;
     double x0, epsilon;
+//	double eabs, erel;	
     int max_iter;
 
     // ler parâmetros e conferir equação
@@ -135,9 +160,8 @@ int main()
     f = evaluator_create(buffer);
     assert(f);
 
-    iterations_t *newton_it = calculate_zero(f, x0, epsilon, max_iter);
-    //iterations_t *sec_it = calculate_zero(f, x0, epsilon, max_iter);
-
+//    iterations_t *newton_it = calculate_zero(f, x0, epsilon, max_iter);
+    iterations_t *sec_it = calculate_zero(f, x0, epsilon, max_iter);
     printf("%1.16e %1.16e\n", newton_it->iteration[0][0], newton_it->iteration[0][1]);
 
     evaluator_destroy(f);
