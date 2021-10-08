@@ -161,17 +161,26 @@ double calculate_absolute_error(double cur, double next){
 */
 
 int ulp(double newt, double sec){
-	long ni, si;
+	long ni, si, z;
 	double n = newt;
 	double s = sec;
+	double zero = 0.0;
 	memcpy(&ni, &n, sizeof(double));
-	memcpy(&si, &s, sizeof(double));
-	if (n*s < 0)
-		return  abs(ni) + abs(si) - 1;
-	else if (ni-si == 0)
+	memcpy(&si, &s, sizeof(double));	
+	if (n*s < 0){
+		n = fabs(newt);
+		s = fabs(sec);
+		memcpy(&ni, &n, sizeof(double));
+		memcpy(&si, &s, sizeof(double));
+		memcpy(&z, &zero, sizeof(double));		
+		return  abs(ni) + abs(si) -2*zero - 1;
+	}
+	else if (ni-si == 0){
 		return 0;
-	else
+	}
+	else{
 		return abs(ni - si) - 1;
+	}
 }
 
 int main()
