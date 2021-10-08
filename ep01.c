@@ -208,6 +208,7 @@ int main()
         printf("%1.16e, ", calculate_absolute_error(newton_x, sec_x));
         printf("%1.16e, ", calculate_relative_error(newton_x, sec_x));
         printf("%d\n", ulp(newton_x, sec_x));
+        printf("%lld\n", ulp(newton_x, sec_x));
     }
     evaluator_destroy(f);
     return 0;
