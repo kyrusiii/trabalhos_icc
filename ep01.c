@@ -188,6 +188,7 @@ int main()
     {
         double newton_x = newton_it->iteration[i][0];
         double sec_x = sec_it->iteration[i][0];
+        printf("%d, ", i);
         printf("%1.16e, %1.16e, ", newton_it->iteration[i][0], newton_it->iteration[i][1]);
         printf("%1.16e, %1.16e, ", sec_it->iteration[i][0], sec_it->iteration[i][1]);
         printf("%1.16e, ", calculate_absolute_error(newton_x, sec_x));
