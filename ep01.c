@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <matheval.h>
 #include <assert.h>
+#include <string.h>
+
 
 #define ITER_LIMIT 100
 #define MAX_BUFFER_SIZE 256
@@ -141,12 +143,16 @@ double calculate_absolute_error(double cur, double next){
 /*
 	Calcula os ULP entre cada aproximação
 */
-/*
-int ulp(double newt, double sec){
-	
-	return 1;
+
+long long ulp(double newt, double sec){
+	long long ni, si;
+	double n = newt;
+	double s = sec;
+	memcpy(&ni, &n, 8);
+	memcpy(&si, &s, 8);
+	return llabs(ni - si);
 }
-*/
+
 int main()
 {
     char buffer[MAX_BUFFER_SIZE];
