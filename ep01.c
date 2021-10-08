@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <matheval.h>
 #include <assert.h>
+#include <math.h>
 
 #define ITER_LIMIT 100
 #define MAX_BUFFER_SIZE 256
 #define DERIV_VARIABLE "x"
-
-#define NEWTON_NEXTVAL "(fx + fx1)/fx1"
 
 /*****************************************************************
  ESTRUTURA DE ITERAÇÕES
@@ -74,7 +73,8 @@ double calculate_function(void *f, double x)
     int count;
     evaluator_get_variables(f, &names, &count);
     double f_x = evaluator_evaluate(f, count, names, values);
-	return f_x;
+
+    return f_x;
 }
 
 /* 
@@ -82,7 +82,9 @@ double calculate_function(void *f, double x)
 */
 double next_value_newton(double x, void *f, void *f_prim)
 {
-    return 1.0;
+    double f_x = calculate_function(f, x);
+    double f_prim_x = calculate_function(f_prim, x);
+    return x - f_x/f_prim_x;
 }
 
 /* 
@@ -120,10 +122,14 @@ iterations_t *calculate_zero(void *f, double x0, double epsilon, int max_iter)
     assert(f_prim);
 
     // Calcular iterações
-    double x1 = next_value_newton(x0, f, f_prim);
-    double error = calculate_error(x0, x1);
-
-    push_iteration(iterations, x0, error);
+    double x_cur = x0, x_next;
+    for (int i = 0; i < max_iter; ++i)
+    {
+        double x_next = next_value_newton(x_cur, f, f_prim);
+        double error = calculate_error(x_cur, x_next);
+        push_iteration(iterations, x_cur, error);
+        x_cur = x_next;
+    }
 
     evaluator_destroy(f_prim);
 
@@ -134,7 +140,7 @@ iterations_t *calculate_zero(void *f, double x0, double epsilon, int max_iter)
 	Calcula o erro entre os métodos empregados
 */
 double calculate_absolute_error(double cur, double next){
-	return fabs( newt - sec);
+	return fabs( cur - next );
 //	return 1.0;
 }
 
@@ -160,9 +166,11 @@ int main()
     f = evaluator_create(buffer);
     assert(f);
 
-//    iterations_t *newton_it = calculate_zero(f, x0, epsilon, max_iter);
-    iterations_t *sec_it = calculate_zero(f, x0, epsilon, max_iter);
-    printf("%1.16e %1.16e\n", newton_it->iteration[0][0], newton_it->iteration[0][1]);
+    iterations_t *newton_it = calculate_zero(f, x0, epsilon, max_iter);
+    //iterations_t *sec_it = calculate_zero(f, x0, epsilon, max_iter);
+
+    for (int i = 0; i < newton_it->size; ++i)
+        printf("%1.16e %1.16e\n", newton_it->iteration[i][0], newton_it->iteration[i][1]);
 
     evaluator_destroy(f);
     return 0;
