@@ -166,7 +166,12 @@ int ulp(double newt, double sec){
 	double s = sec;
 	memcpy(&ni, &n, sizeof(double));
 	memcpy(&si, &s, sizeof(double));
-	return abs(ni - si) - 1;
+	if (n*s < 0)
+		return  abs(ni) + abs(si) - 1;
+	else if (ni-si == 0)
+		return 0;
+	else
+		return abs(ni - si) - 1;
 }
 
 int main()
